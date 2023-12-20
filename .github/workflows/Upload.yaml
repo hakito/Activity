@@ -1,0 +1,35 @@
+name: Uploads
+on:
+  - push
+
+jobs:
+  first:
+    name: upload first
+    runs-on: Windows
+    steps:
+      - run: echo "first" > actual
+      - uses: actions/upload-artifact@v3
+        with:
+          name: actual
+          path: actual
+  second:
+    needs: [first]
+    name: upload second
+    runs-on: Windows
+    steps:
+      - run: echo "second" > actual
+      - uses: actions/upload-artifact@v3
+        with:
+          name: actual
+          path: actual
+  verify:
+    needs: [second]
+    name: Verify contents
+    runs-on: Windows
+    steps:
+      - name: Fetch Integration Tests from Build
+        uses: actions/download-artifact@v3
+        with:
+          name: actual
+      - run: echo "second" > expected
+      - run: fc.exe expected actual
